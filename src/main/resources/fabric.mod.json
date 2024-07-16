@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "panorama_window",
+  "version": "${version}",
+  "name": "PanoramaWindow",
+  "description": "",
+  "authors": [],
+  "contact": {
+    "repo": "https://github.com/TORO-Server/PanoramaWindow"
+  },
+  "license": "MIT",
+  "icon": "assets/panorama_window/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "marumasa.panorama_window.client.PanoramaWindowClient"
+    ],
+    "main": [
+      "marumasa.panorama_window.PanoramaWindow"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
