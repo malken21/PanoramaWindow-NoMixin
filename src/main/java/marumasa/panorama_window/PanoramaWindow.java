@@ -8,8 +8,10 @@ public class PanoramaWindow implements ModInitializer {
     // Logger
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOD_ID = "panorama_window";
+    public static final Config CONFIG = new Config();
 
     @Override
     public void onInitialize() {
+        LOGGER.info("Start: " + MOD_ID);
     }
 }
