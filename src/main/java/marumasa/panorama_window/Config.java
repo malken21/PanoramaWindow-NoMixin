@@ -16,9 +16,9 @@ public class Config {
 
     private static final Path path = FabricLoader.getInstance().getConfigDir().normalize().resolve(MOD_ID + ".json");
 
-    private int CameraSize = 2048;
-    private int Width = 3840;
-    private int Height = 2160;
+    private int CameraSize = 512;
+    private int Width = 1280;
+    private int Height = 720;
     private boolean Borderless = false;
 
     public int getCameraSize() {
