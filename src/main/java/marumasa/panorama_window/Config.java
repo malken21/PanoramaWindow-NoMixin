@@ -19,55 +19,7 @@ public class Config {
     private int CameraSize = 2048;
     private int Width = 3840;
     private int Height = 2160;
-
-    private record JsonModel(
-            int CameraSize,
-            int Width,
-            int Height
-    ) {
-    }
-
-    private static final Gson gson = new Gson();
-
-    private static JsonModel loadJSON() {
-        try (final BufferedReader reader = Files.newBufferedReader(Config.path)) {
-            return gson.fromJson(reader, JsonModel.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static void saveJSON(JsonModel model) {
-        try (final BufferedWriter writer = Files.newBufferedWriter(Config.path)) {
-            gson.toJson(model, model.getClass(), writer);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void deserialize() {
-        final JsonModel model = loadJSON();
-        CameraSize = model.CameraSize();
-        Width = model.Width();
-        Height = model.Height();
-    }
-
-    private void serialize() {
-        saveJSON(new JsonModel(
-                getCameraSize(),
-                getWidth(),
-                getHeight())
-        );
-    }
-
-    public Config() {
-        final File configFile = path.toFile();
-        if (!configFile.exists()) {
-            serialize();
-        } else {
-            deserialize();
-        }
-    }
+    private boolean Borderless = false;
 
     public int getCameraSize() {
         return CameraSize;
@@ -94,5 +46,66 @@ public class Config {
     public void setHeight(int height) {
         Height = height;
         serialize();
+    }
+
+    public boolean isBorderless() {
+        return Borderless;
+    }
+
+    public void setBorderless(boolean borderless) {
+        Borderless = borderless;
+        serialize();
+    }
+
+    private record JsonModel(
+            int CameraSize,
+            int Width,
+            int Height,
+            boolean Borderless
+    ) {
+    }
+
+    private static final Gson gson = new Gson();
+
+    private static JsonModel loadJSON() {
+        try (final BufferedReader reader = Files.newBufferedReader(Config.path)) {
+            return gson.fromJson(reader, JsonModel.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void saveJSON(JsonModel model) {
+        try (final BufferedWriter writer = Files.newBufferedWriter(Config.path)) {
+            gson.toJson(model, model.getClass(), writer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void deserialize() {
+        final JsonModel model = loadJSON();
+        CameraSize = model.CameraSize();
+        Width = model.Width();
+        Height = model.Height();
+        Borderless = model.Borderless();
+    }
+
+    private void serialize() {
+        saveJSON(new JsonModel(
+                getCameraSize(),
+                getWidth(),
+                getHeight(),
+                isBorderless()
+        ));
+    }
+
+    public Config() {
+        final File configFile = path.toFile();
+        if (!configFile.exists()) {
+            serialize();
+        } else {
+            deserialize();
+        }
     }
 }

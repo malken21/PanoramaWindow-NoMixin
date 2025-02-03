@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 
 import java.nio.ByteBuffer;
 
+import static marumasa.panorama_window.PanoramaWindow.CONFIG;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFWErrorCallback.createPrint;
 import static org.lwjgl.opengl.GL31.*;
@@ -15,6 +16,37 @@ public class WindowManager {
     private final int window_width;
     private final int window_height;
     private final int camera_size;
+
+    private WindowPos windowPos;
+    private CursorPos cursorPos;
+    private boolean isDragging = false;
+
+    private static final class WindowPos {
+        public final int x;
+        public final int y;
+
+        public WindowPos(long window) {
+            int[] x = new int[1];
+            int[] y = new int[1];
+            glfwGetWindowPos(window, x, y);
+            this.x = x[0];
+            this.y = y[0];
+        }
+    }
+
+    private static final class CursorPos {
+        public final double x;
+        public final double y;
+
+        public CursorPos(long window) {
+            double[] x = new double[1];
+            double[] y = new double[1];
+            glfwGetCursorPos(window, x, y);
+            this.x = x[0];
+            this.y = y[0];
+
+        }
+    }
 
     public WindowManager(int width, int height, String title, int camera_size, MinecraftClient client) {
         window_width = width;
@@ -30,16 +62,40 @@ public class WindowManager {
         glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
         // ウィンドウのサイズを変更不可にする
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        // ボーダーレスにするかどうかを設定する
+        glfwWindowHint(GLFW_DECORATED, CONFIG.isBorderless() ? GLFW_FALSE : GLFW_TRUE);
+        // 垂直同期をオフにする
+        glfwSwapInterval(0);
         // ウィンドウを作成
         window = glfwCreateWindow(window_width, window_height, title, 0, 0);
         // OpenGLコンテキストの初期化
         glfwMakeContextCurrent(window);
-        // 垂直同期をオフにする
-        glfwSwapInterval(0);
+
+        // マウスボタンコールバックの設定
+        glfwSetMouseButtonCallback(window, (window, button, action, mods) -> {
+            if (button == GLFW_MOUSE_BUTTON_LEFT) {
+                if (action == GLFW_PRESS) {
+                    isDragging = true;
+                    cursorPos = new CursorPos(window);
+                } else if (action == GLFW_RELEASE) {
+                    isDragging = false;
+                }
+            }
+        });
+
+        // マウスカーソル位置コールバックの設定
+        glfwSetCursorPosCallback(window, (window, xpos, ypos) -> {
+            if (isDragging) {
+                windowPos = new WindowPos(window);
+                CursorPos currentPos = new CursorPos(window);
+                double dx = currentPos.x - cursorPos.x;
+                double dy = currentPos.y - cursorPos.y;
+                glfwSetWindowPos(window, windowPos.x + (int) dx, windowPos.y + (int) dy);
+            }
+        });
 
 
         shaderManager = new ShaderManager();
-
 
         // VAOとVBOの作成
         int vaoID = glGenVertexArrays();
@@ -98,6 +154,8 @@ public class WindowManager {
         glViewport(0, 0, window_width, window_height);
         loadUniforms(buffers, camera_size, camera_size);
         runShader();
+        // イベントの処理
+        glfwPollEvents();
 
         // OpenGLコンテキストの初期化 ()
         glfwMakeContextCurrent(MinecraftClient.getInstance().getWindow().getHandle());
