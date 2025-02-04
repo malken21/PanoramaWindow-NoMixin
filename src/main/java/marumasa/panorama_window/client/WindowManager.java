@@ -190,7 +190,6 @@ public class WindowManager {
         return textureID;
     }
 
-
     private void loadUniforms(ByteBuffer[] buffers, int width, int height) {
 
         // texFront
