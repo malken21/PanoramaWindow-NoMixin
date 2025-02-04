@@ -70,6 +70,8 @@ public class WindowManager {
         window = glfwCreateWindow(window_width, window_height, title, 0, 0);
         // OpenGLコンテキストの初期化
         glfwMakeContextCurrent(window);
+        // ウィンドウ全体を黒色を描画する
+        runBlack();
 
         // マウスボタンコールバックの設定
         glfwSetMouseButtonCallback(window, (window, button, action, mods) -> {
@@ -147,18 +149,33 @@ public class WindowManager {
     private final int VBO;
     private final ShaderManager shaderManager;
 
-    public void render(ByteBuffer[] buffers) {
+    public void renderShader(ByteBuffer[] buffers) {
         // OpenGLコンテキストの初期化
         glfwMakeContextCurrent(window);
 
         glViewport(0, 0, window_width, window_height);
         loadUniforms(buffers, camera_size, camera_size);
         runShader();
-        // イベントの処理
-        glfwPollEvents();
 
         // OpenGLコンテキストの初期化 ()
         glfwMakeContextCurrent(MinecraftClient.getInstance().getWindow().getHandle());
+    }
+
+    public void renderBlack() {
+        // OpenGLコンテキストの初期化
+        glfwMakeContextCurrent(window);
+
+        glViewport(0, 0, window_width, window_height);
+        runBlack();
+
+        // OpenGLコンテキストの初期化 ()
+        glfwMakeContextCurrent(MinecraftClient.getInstance().getWindow().getHandle());
+    }
+
+    private void runBlack() {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 画面をクリア
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // 画面をクリアする色
+        glfwSwapBuffers(window);
     }
 
     // テクスチャ読み込み

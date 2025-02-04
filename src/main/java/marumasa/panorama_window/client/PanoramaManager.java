@@ -3,6 +3,7 @@ package marumasa.panorama_window.client;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.SimpleFramebuffer;
+import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.AreaEffectCloudEntity;
@@ -34,6 +35,9 @@ public class PanoramaManager {
 
         int i = window.getFramebufferWidth();
         int j = window.getFramebufferHeight();
+        Perspective k = client.options.getPerspective();
+        client.options.setPerspective(Perspective.FIRST_PERSON);
+
         Framebuffer framebuffer = new SimpleFramebuffer(width, height, true, IS_SYSTEM_MAC);
         float yaw = client.player.getYaw();
         client.gameRenderer.setBlockOutlineEnabled(false);
@@ -90,6 +94,7 @@ public class PanoramaManager {
         } finally {
             client.setCameraEntity(camera_default);
             camera.remove(Entity.RemovalReason.KILLED);
+            client.options.setPerspective(k);
 
             client.gameRenderer.setBlockOutlineEnabled(true);
             window.setFramebufferWidth(i);
